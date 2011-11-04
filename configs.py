@@ -210,7 +210,7 @@ max_connections = 85
 #
 
 # archive_mode = on
-# archive_command = 'rsync -qarv %p /pg_archive/%f > /dev/null'
+# archive_command = 'rsync -qarv %%p /pg_archive/%%f > /dev/null'
 # archive_timeout = 300 
 
 #
@@ -218,7 +218,7 @@ max_connections = 85
 #
 
 # Make sure to timestamp the logs.
-log_line_prefix = '%t '
+log_line_prefix = '%%t '
 
 #
 # Locale
