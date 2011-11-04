@@ -18,13 +18,15 @@ server_name = ""
 sitename = ""
 aliasname = ""
 
+db_name = ""
+
 hosts = []
 
 single_machine_setup = True
 
 dev_packages = [
                 "git-core",
-                # "postgresql",
+                "postgresql",
                 "build-essential",
                 "python-dev",
                 "python-setuptools",

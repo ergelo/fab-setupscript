@@ -159,7 +159,7 @@ http {
 }
 """ % (s.sitename, s.prefix, s.sitename, s.sitename, s.aliasname, s.sitename, s.aliasname, s.aliasname, s.sitename, s.github_main_repo, s.github_main_repo, s.sitename)
 
-pghba = """# Postgres auth. file (/etc/postgresql/8.4/main/pg_hba.conf).
+pg_hba = """# Postgres auth. file (/etc/postgresql/8.4/main/pg_hba.conf).
 
 # Trust all connections from localhost
 local all all trust
@@ -174,7 +174,7 @@ local all all trust
 # host all all 10.X.X.X/32 md5
 """
 
-postgres = """
+postgresql = """
 # PostgreSQL configuration file (/etc/postgresql/8.4/main/postgresql.conf)
 #
 # The OS-supplied postgresql.conf has every configuration directive known

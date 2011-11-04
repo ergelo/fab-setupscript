@@ -26,8 +26,45 @@ def user_routine():
     sudo("mkdir -p /home/web/")
     sudo("chown -R %s /home/web/" % s.username)
 
+def webserver_setup_routine():
+    user()
+    with cd("/etc/apache2"):
+        sudo("rm -rf apache2.conf conf.d/ httpd.conf magic mods-* sites-* ports.conf")
+        sudo("echo %s > apache2.conf" % cf.apache2)
+    with cd('/etc/nginx/'):
+        sudo('rm -rf conf.d/ fastcgi_params koi-* nginx.conf sites-* win-utf')
+        sudo("echo %s > nginx.conf" % cf.nginx)
+        sudo('/etc/init.d/nginx start')
+    amazon_reload()
+    nginx_reload()
 
+def db_setup_routine():
+    sudo('invoke-rc.d postgresql stop')
+    with cd('/etc/postgresql/8.4/main/'):
+        sudo('mv postgresql.conf postgresql.conf.orig')
+        sudo('mv pg_hba.conf pg_hba.conf.orig')
+        sudo("echo %s > postgresql.conf" % cf.postgresql)
+        sudo("echo %s > pg_hba.conf" % cf.pg_hba)
+    sudo('invoke-rc.d postgresql start')
 
+    sudo('createuser %s -s -d -r' % s.dbname, user='postgres')
+    user('createdb -O %s %s' % (s.username, s.dbname))
+
+def django_site_setup_routine():
+    with cd("/home/web/"):
+        sudo("git clone git@github.com:%s/%s.git" % (s.github_name, s.github_main_repo))
+
+    sudo('echo "export DJANGO_SETTINGS_MODULE=server_settings" >> /etc/profile')
+    sudo('echo "export PYTHONPATH=/home/web/%s" >> /etc/profile' % s.github_main_repo)
+    sudo('source /etc/profile')
+
+    with cd('/home/web/%s/' % s.github_main_repo):
+        run('export DJANGO_SETTINGS_MODULE=%s' % s.settings_module)
+        run('export PYTHONPATH=.')
+        run('django-admin.py syncdb')
+        if "south" in s.modules:
+            run('django-admin.py migrate')
+        run('ln -s /usr/local/lib/python2.6/dist-packages/django/contrib/admin/media/ siteMedia/admin-media')
 
 #########################
 #                       #
