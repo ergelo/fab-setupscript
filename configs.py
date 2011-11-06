@@ -1,6 +1,6 @@
 import settings as s
 
-apache = """# Apache conf (/etc/apache2/apache2.conf)
+apache2 = """# Apache conf (/etc/apache2/apache2.conf)
 
 #
 # Basic server setup
@@ -65,7 +65,7 @@ TypesConfig /etc/mime.types
     DocumentRoot "/home/web/%s/siteMedia"
 
     LogLevel warn
-    LogFormat "%%h %%l %%u %%t \"%%r\" %%>s %%b \"%%{Referer}i\" \"%%{User-agent}i\"" combined
+    LogFormat "%%h %%l %%u %%t \\"%%r\\" %%>s %%b \\"%%{Referer}i\\" \\"%%{User-agent}i\\"" combined
     ErrorLog /var/log/apache2/error.log
     CustomLog /var/log/apache2/access.log combined
 
@@ -152,12 +152,12 @@ http {
         # Proxy everything else to the backend
         location / {
             proxy_pass http://%s;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;      
-            add_header X-Handled-By $upstream_addr;      
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            add_header X-Handled-By $upstream_addr;
         }
     }
 }
-""" % (s.sitename, s.prefix, s.sitename, s.sitename, s.aliasname, s.sitename, s.aliasname, s.aliasname, s.sitename, s.github_main_repo, s.github_main_repo, s.sitename)
+""" % (s.sitename, s.prefix, s.sitename, s.sitename, s.aliasname, s.sitename, s.aliasname, s.sitename, s.sitename, s.github_main_repo, s.github_main_repo, s.sitename)
 
 pg_hba = """# Postgres auth. file (/etc/postgresql/8.4/main/pg_hba.conf).
 
@@ -238,3 +238,4 @@ lc_time = 'C'
 # default configuration for text search
 default_text_search_config = 'pg_catalog.english'
 """ % s.prefix
+

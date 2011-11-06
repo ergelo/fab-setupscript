@@ -2,6 +2,7 @@ username = ""
 password = ""
 
 github_name = ""
+github_username = ""
 github_email = ""
 
 github_main_repo = ""
@@ -38,6 +39,7 @@ dev_packages = [
                 "libapache2-mod-wsgi",
                 "nginx",
                 "sendmail",
+                "vim",
             ]
 
 dev_modules = [
@@ -55,11 +57,11 @@ dev_modules = [
 
 dev_github_eggs = [
                 {
-                    'name': 'gabrielgrant',
+                    'user': 'gabrielgrant',
                     'project': 'django-extensions'
                 },
                 {
-                    'name': 'saschwarz',
+                    'user': 'saschwarz',
                     'project':'minidetector'
                 }
             ]

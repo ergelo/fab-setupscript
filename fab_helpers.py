@@ -2,6 +2,7 @@ from fabric.api import *
 from fabric.contrib.console import confirm
 import settings as s
 import configs as cf
+import StringIO
 
 
 #########################
@@ -28,13 +29,17 @@ def user_routine():
 
 def webserver_setup_routine():
     user()
+
     with cd("/etc/apache2"):
         sudo("rm -rf apache2.conf conf.d/ httpd.conf magic mods-* sites-* ports.conf")
-        sudo("echo %s > apache2.conf" % cf.apache2)
+    write_file(cf.apache2, '/etc/apache2/apache2.conf')
+    sudo('/etc/init.d/apache2 start')
+
     with cd('/etc/nginx/'):
         sudo('rm -rf conf.d/ fastcgi_params koi-* nginx.conf sites-* win-utf')
-        sudo("echo %s > nginx.conf" % cf.nginx)
-        sudo('/etc/init.d/nginx start')
+    write_file(cf.nginx, '/etc/nginx/nginx.conf')
+    sudo('/etc/init.d/nginx start')
+
     amazon_reload()
     nginx_reload()
 
@@ -43,16 +48,16 @@ def db_setup_routine():
     with cd('/etc/postgresql/8.4/main/'):
         sudo('mv postgresql.conf postgresql.conf.orig')
         sudo('mv pg_hba.conf pg_hba.conf.orig')
-        sudo("echo %s > postgresql.conf" % cf.postgresql)
-        sudo("echo %s > pg_hba.conf" % cf.pg_hba)
+    write_file(cf.postgresql, '/etc/postgresql/8.4/main/postgresql.conf')
+    write_file(cf.pg_hba, '/etc/postgresql/8.4/main/pg_hba.conf')
     sudo('invoke-rc.d postgresql start')
 
     sudo('createuser %s -s -d -r' % s.dbname, user='postgres')
-    user('createdb -O %s %s' % (s.username, s.dbname))
+    run('createdb -O %s %s' % (s.username, s.dbname))
 
 def django_site_setup_routine():
     with cd("/home/web/"):
-        sudo("git clone git@github.com:%s/%s.git" % (s.github_name, s.github_main_repo))
+        sudo("git clone git@github.com:%s/%s.git" % (s.github_username, s.github_main_repo))
 
     sudo('echo "export DJANGO_SETTINGS_MODULE=server_settings" >> /etc/profile')
     sudo('echo "export PYTHONPATH=/home/web/%s" >> /etc/profile' % s.github_main_repo)
@@ -93,13 +98,13 @@ def createuser():
 
 def make_su(username):
     "make user a su"
-    install('sudo')
+    apt_install('sudo')
     run('echo "%s  ALL=(ALL) ALL" >> /etc/sudoers' % s.username)
     run('chmod 440 /etc/sudoers')
 
 #package installing functions
 def apt_install(package):
-    sudo('apt-get --yes install %s' % package)
+    run('apt-get --yes install %s' % package)
 
 def pip_install(module):
     sudo("pip install %s" % module)
@@ -117,6 +122,7 @@ def update_apt():
 
 def apt_setup():
     packages = ' '.join(s.dev_packages)
+    root()
     apt_install(packages)
 
 def pip_setup():
@@ -126,7 +132,9 @@ def pip_setup():
 
 def github_egg_setup():
     for egg in s.dev_github_eggs:
-        github_egg_install(egg[user], egg[project])
+        github_egg_install(egg['user'], egg['project'])
+        if egg['project'] == 'minidetector':
+            put('search_strings.txt', '/usr/local/lib/python2.6/dist-packages/minidetector/search_strings.txt', use_sudo=True)
 
 #networking
 def setup_ssh():
@@ -148,22 +156,26 @@ def compile_hosts():
     #         with settings(host_string=host):
     internal = '.'.join(run('hostname').split('.')[0].split('-')[1:])
     external = '.'.join(env.host_string.split('.')[0].split('-')[1:])
-    lines.append('%s %s_dev1_int' % (internal, prefix))
-    lines.append('%s %s_dev1_ext' % (external, prefix))
+    lines.append('%s %s_dev1_int' % (internal, s.prefix))
+    lines.append('%s %s_dev1_ext' % (external, s.prefix))
     for l in lines:
         sudo('echo %s >> /etc/hosts' % l)
+
+#config file creation
+def write_file(source, filename):
+    conf_file = StringIO.StringIO()
+    conf_file.write(source)
+    put(conf_file, filename, use_sudo=True)
+    conf_file.close()
 
 #webserver functions
 def amazon_reload():
     "Reload Apache to pick up new code changes."
     user()
-    sudo("invoke-rc.d apache2 reload")
+    sudo("/etc/init.d/apache2 reload")
 
 def nginx_reload():
     "Reload nginx"
     user()
-    sudo("invoke-rc.d nginx reload")
-
-def nginx_test():
-    local('echo "%s" > testnginx.conf' % cf.nginx)
+    sudo("/etc/init.d/nginx reload")
 
