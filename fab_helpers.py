@@ -43,6 +43,8 @@ def webserver_setup_routine():
     amazon_reload()
     nginx_reload()
 
+    sudo('/etc/init.d/nginx start')
+
 def db_setup_routine():
     sudo('invoke-rc.d postgresql stop')
     with cd('/etc/postgresql/8.4/main/'):
@@ -57,7 +59,7 @@ def db_setup_routine():
 
 def django_site_setup_routine():
     with cd("/home/web/"):
-        sudo("git clone git@github.com:%s/%s.git" % (s.github_username, s.github_main_repo))
+        run("git clone git@github.com:%s/%s.git" % (s.github_username, s.github_main_repo))
 
     sudo('echo "export DJANGO_SETTINGS_MODULE=server_settings" >> /etc/profile')
     sudo('echo "export PYTHONPATH=/home/web/%s" >> /etc/profile' % s.github_main_repo)
@@ -67,7 +69,7 @@ def django_site_setup_routine():
         run('export DJANGO_SETTINGS_MODULE=%s' % s.settings_module)
         run('export PYTHONPATH=.')
         run('django-admin.py syncdb')
-        if "south" in s.modules:
+        if "south" in s.dev_modules:
             run('django-admin.py migrate')
         run('ln -s /usr/local/lib/python2.6/dist-packages/django/contrib/admin/media/ siteMedia/admin-media')
 
@@ -108,12 +110,16 @@ def apt_install(package):
 
 def pip_install(module):
     sudo("pip install %s" % module)
+    if 'django-piston' in module:
+        sudo("pip install -I django-piston==0.2.2" % module)
 
 def github_egg_install(user, project):
     run('git clone https://github.com/%s/%s.git' % (user, project))
     with cd('%s/' % project):
         sudo('python setup.py install')
     sudo('rm -rf %s' % project)
+    if project == 'minidetector':
+        put('search_strings.txt', '/usr/local/lib/python2.6/dist-packages/minidetector/search_strings.txt', use_sudo=True)
 
 #installation frameworks setup
 def update_apt():
@@ -133,8 +139,6 @@ def pip_setup():
 def github_egg_setup():
     for egg in s.dev_github_eggs:
         github_egg_install(egg['user'], egg['project'])
-        if egg['project'] == 'minidetector':
-            put('search_strings.txt', '/usr/local/lib/python2.6/dist-packages/minidetector/search_strings.txt', use_sudo=True)
 
 #networking
 def setup_ssh():
