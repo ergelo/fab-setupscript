@@ -32,4 +32,4 @@ Fill in your settings, then execute `fab main` and it will do its magic. More
 to come.
 
 _Deployment Tools_
-Fill in the settings at the top of the fabfile, run commands.
+Copy the fabfile into your project directory, fill in the settings at the top of the fabfile, run commands.
