@@ -27,9 +27,9 @@ github.
 
 **Instructions**
 
-_Server Setup Script_
+_Server Setup Script_    
 Fill in your settings, then execute `fab main` and it will do its magic. More
 to come.
 
-_Deployment Tools_
+_Deployment Tools_    
 Copy the fabfile into your project directory, fill in the settings at the top of the fabfile, run commands.
