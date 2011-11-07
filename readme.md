@@ -19,3 +19,10 @@ It is obviously a work in progress, here is the TODO list:
 * db machines
 * multi-machine setups
 * deployment tools
+
+****
+
+**Instructions**
+
+Fill in your settings, then execute `fab main` and it will do its magic. More
+to come.
