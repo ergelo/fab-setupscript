@@ -18,11 +18,18 @@ It is obviously a work in progress, here is the TODO list:
 * further customise config file templates
 * db machines
 * multi-machine setups
-* deployment tools
 
+Also includes a fabfile for deployment tools. This is geared towards some
+common routines in our workflow, such as resetting the db,
+opening/closing feature branches, deploying to server and backing up to
+github.
 ****
 
 **Instructions**
 
+_Server Setup Script_
 Fill in your settings, then execute `fab main` and it will do its magic. More
 to come.
+
+_Deployment Tools_
+Fill in the settings at the top of the fabfile, run commands.
