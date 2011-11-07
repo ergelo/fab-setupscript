@@ -43,6 +43,7 @@ def webserver_setup_routine():
     amazon_reload()
     nginx_reload()
 
+    sudo('/etc/init.d/apache2 start')
     sudo('/etc/init.d/nginx start')
 
 def db_setup_routine():
@@ -111,7 +112,7 @@ def apt_install(package):
 def pip_install(module):
     sudo("pip install %s" % module)
     if 'django-piston' in module:
-        sudo("pip install -I django-piston==0.2.2" % module)
+        sudo("pip install -I django-piston==0.2.2")
 
 def github_egg_install(user, project):
     run('git clone https://github.com/%s/%s.git' % (user, project))
