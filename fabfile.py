@@ -23,9 +23,9 @@ def main():
 
 def dev_setup():
     "setup dev server machine"
-    
+
     root()
-    
+
     update_apt()
     user_routine()
 

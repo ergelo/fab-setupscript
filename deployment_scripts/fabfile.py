@@ -42,12 +42,13 @@ def new_branch(branch):
 
 #nukes the db, creates a new one and runs syncdb, optionally south migrate as well
 def reset_db(dbname, south=False):
-    user()
-    nuke_db(dbname)
-    with cd('/home/web/%s/' % project_directory):
-        run('django-admin.py syncdb')
-        if south:
-            run ('django-admin.py migrate')
+    if confirm('You are deleting the database without backing up, sure you want to proceed?'):
+        user()
+        nuke_db(dbname)
+        with cd('/home/web/%s/' % project_directory):
+            run('django-admin.py syncdb')
+            if south:
+                run ('django-admin.py migrate')
 
 ################
 #    helpers   #
